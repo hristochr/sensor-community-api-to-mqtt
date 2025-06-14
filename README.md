@@ -1,7 +1,7 @@
 # Sensor Community self-hosted API bridge to MQTT broker
 
 ## Description 
-Inspired by the incredible work of [Sensor.Community](https://sensor.community/en/) to make environmental data more trackable and transparent as well as [this similar project](https://github.com/jklmnn/airrohr-mqtt), I developed a simple self-hosted API accepting the data from an air sensor and sending it to a HiveMQ MQTT broker. Having the data in cloud enables more complex scenarios such as real-time monitoring, triggers, etc. 
+Inspired by the incredible work of [Sensor.Community](https://sensor.community/en/) to make environmental data more trackable and transparent as well as [this similar project](https://github.com/jklmnn/airrohr-mqtt), I developed a simple self-hosted API accepting the data from an air sensor and sending it to a HiveMQ MQTT broker. Having the data in the cloud enables more complex scenarios such as real-time monitoring, triggers, etc. 
 
 ### Requirements
 - Python >= v 3.11
@@ -15,7 +15,7 @@ If starting from scratch, first go to the DIY guide [here](https://sensor.commun
 #### Custom API Configuration
 The API is currently designed to run on a local machine on the same network as the sensor. Check your own IP and configure **Send data to custom API** accordingly:
 
-![image](images\custom-api-config.png)
+![image](images/custom-api-config.png)
 
 #### MQTT Broker
 Visit [HiveMQ](https://www.hivemq.com/) to sign up for a free cloud-based MQTT broker. 
@@ -36,27 +36,27 @@ Modify the `api.bat` file by providing:
 2. provide the path to the entry file `main.py`.
 
 Then you can use the Windows task scheduler to run the .bat file every time you log in to Windows:
-![image](images\api.bat-task.png)
+![image](images/api.bat-task.png)
 
 ## Features
 - one endpoint accepting the POST request with the payload from your sensor. Once the FastAPI server is running you will be able to access the document at `localhost:8000/docs`:
 
-![image](images\endpoint.png)
+![image](images/endpoint.png)
 
 If everything has been configured correctly:
 - the console will show:
-    ![image](images\result.png)
+    ![image](images/result.png)
 - the output will be visible in the HiveMQ cloud console:
-    ![image](images\result-mqtt.png)
+    ![image](images/result-mqtt.png)
 
 ## Notes 
-You can check the your sensor current payload from the latest measurement at `localhost/data.json`. I have included a sample in the /models subfolder. 
-![image](images\payload.png)
+You can check your current sensor payload from the latest measurement at `sensor-localhost/data.json`. I have included a sample in the `/models` subfolder. 
+![image](images/payload.png)
 
 I have organized the project to allow scability and further expansion by, for instance, adding different models and different endpoints for different sensors. 
 
 **Enjoy!**
 
-## Change log
+## Change logs
 - 13.06.2025: design and testing
 - 14.06.2025: initial commit.
