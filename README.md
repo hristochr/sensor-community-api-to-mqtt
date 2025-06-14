@@ -45,7 +45,7 @@ Then you can use the Windows task scheduler to run the .bat file every time you 
 
 If everything has been configured correctly:
 - the console will show:
-    ![image](images/result.png)
+    ![image](images/result-console.png)
 - the output will be visible in the HiveMQ cloud console:
     ![image](images/result-mqtt.png)
 
