@@ -26,7 +26,7 @@ Running the API requires setting six environment variables. One way to do is to 
 - `API_USERNAME` = "user name for logging in to the API"
 - `API_PASSWORD` = "password for logging in to the API"
 - `MQTT_TOPIC`="uns/weather"
-- `BROKER_HIV`E="your HiveMQ URL"
+- `BROKER_HIVE`="your HiveMQ URL"
 - `MQTT_USERNAME`="HiveMQ credentials user name"
 - `MQTT_PASSWORD`="HiveMQ credentials password"
 
@@ -55,8 +55,13 @@ You can check your current sensor payload from the latest measurement at `sensor
 
 I have organized the project to allow scability and further expansion by, for instance, adding different models and different endpoints for different sensors. 
 
+## Sample visualization from MQTT
+Using NodeRed
+![image](images/mqtt_data_visualization.png)
+
 **Enjoy!**
 
-## Change logs
+## Change log
+- 25.07.2025: fixed typo and added image of data visualization
 - 13.06.2025: design and testing
 - 14.06.2025: initial commit.
