@@ -55,8 +55,8 @@ You can check your current sensor payload from the latest measurement at `sensor
 
 I have organized the project to allow scability and further expansion by, for instance, adding different models and different endpoints for different sensors. 
 
-## Sample visualization from MQTT
-Using NodeRed
+## Sample visualization 
+Using NodeRed "MQTT in"
 ![image](images/mqtt_data_visualization.png)
 
 **Enjoy!**
