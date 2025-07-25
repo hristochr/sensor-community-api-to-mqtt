@@ -62,6 +62,6 @@ Using NodeRed
 **Enjoy!**
 
 ## Change log
-- 25.07.2025: fixed typo and added image of data visualization
+- 25.07.2025: fixed typos and added image of data visualization
 - 13.06.2025: design and testing
 - 14.06.2025: initial commit.
