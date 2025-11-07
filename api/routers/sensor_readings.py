@@ -4,9 +4,9 @@ from typing import Dict
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from ..models.air_data import SensorReading
 from ..dependencies import verify_credentials
+from ..rds import RDSConfig
 from ..publisher import MQTTPublisher
 from ..sql_client import SQLClient
-from rds import RDSConfig
 from ..transformer import SensorDataTransformer
 
 
