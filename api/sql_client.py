@@ -1,10 +1,8 @@
 from attrs import define, field
 import logging
-from dotenv import load_dotenv
-from rds import RDSConfig
+from api.rds import RDSConfig
 from api.models.db_model import WeatherData
 
-load_dotenv()
 logger = logging.getLogger(__name__)
 
 

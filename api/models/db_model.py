@@ -2,9 +2,11 @@ from sqlalchemy import (
     MetaData,
     Table,
     Column,
-    Integer
+    Integer,
+    DateTime
     )
 from sqlalchemy.dialects.mssql import JSON, DECIMAL
+from sqlalchemy.sql import text
 from attrs import define, field
 
 
@@ -20,6 +22,7 @@ class WeatherData():
             'WeatherData',
             self.metadata,
             Column('Id', Integer, primary_key=True, autoincrement=True),
+            Column('Timestamp', DateTime, server_default=text('GETDATE()')),
             Column('Temperature', DECIMAL(5, 2), primary_key=True, nullable=False),
             Column('Pressure', DECIMAL(10, 2), nullable=False),
             Column('Humidity', DECIMAL(5, 2), nullable=False),
