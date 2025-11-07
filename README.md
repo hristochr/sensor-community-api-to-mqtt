@@ -23,14 +23,18 @@ Visit [HiveMQ](https://www.hivemq.com/) to sign up for a free cloud-based MQTT b
 #### Environment variables 
 Running the API requires setting six environment variables. One way to do is to create an `.env` file in the `/api` directory. The file must contain:
 
-- `API_USERNAME` = "user name for logging in to the API"
-- `API_PASSWORD` = "password for logging in to the API"
+- `API_USERNAME`="user name for logging in to the API"
+- `API_PASSWORD`="password for logging in to the API"
 - `MQTT_TOPIC`="uns/weather"
 - `BROKER_HIVE`="your HiveMQ URL"
 - `MQTT_USERNAME`="HiveMQ credentials user name"
 - `MQTT_PASSWORD`="HiveMQ credentials password"
+- `DB_SERVER`="azserver2025.database.windows.net"
+- `DB_DATABASE`="MSSQLTips2025"
+- `DB_USERNAME`="hhristov"
+- `DB_PASSWORD`="£>630C8ZMRb."
 
-#### Batch file
+#### Batch file (old version)
 Modify the `api.bat` file by providing:
 1. venv directory to reflect the virtual environment you want to use;
 2. provide the path to the entry file `main.py`.
@@ -38,8 +42,25 @@ Modify the `api.bat` file by providing:
 Then you can use the Windows task scheduler to run the .bat file every time you log in to Windows:
 ![image](images/api.bat-task.png)
 
+#### Running as container (new version)
+
+##### on localhost 
+- install Docker runtime
+- run `docker build -f "Dockerfile" -t "sens-comm-api-mqtt:latest"`
+- run `docker run -p 8000:8000 sens-comm-api-mqtt`
+
+##### on Azure 
+- create Azure Container Registry Service 
+- run `az acr build --registry <ACR_NAME> --image sens-comm-api-mqtt` to push the image to ACR
+- create a storage account `az storage account create -n mystorageaccount1234 -g <RESOURCE_GROUP> -l <LOCATION> --sku Standard_LRS`
+- create a function app `az functionapp create --resource-group <RESOURCE_GROUP> --name <FUNC_NAME> --storage-account <STOR_ACC> --plan <APP_SERVICE_NAME> --image <ACR_NAME>/image_name:latest --assign-identity`
+- set environment variables
+- in case you need to update the existing deployment to use the new image:
+    - run `az functionapp config container set --image <IMAGE_NAME> --registry-password <SECURE_PASSWORD>--registry-username <USER_NAME> --name <APP_NAME> --resource-group <RESOURCE_GROUP>`
+    - restart the function.
+
 ## Features
-- one endpoint accepting the POST request with the payload from your sensor. Once the FastAPI server is running you will be able to access the document at `localhost:8000/docs`:
+- one endpoint accepting the POST request with the payload from your IoT sensor controller. Once the FastAPI server is running you will be able to access the document at `localhost:8000/docs`:
 
 ![image](images/endpoint.png)
 
@@ -62,6 +83,7 @@ Using NodeRed "MQTT in"
 **Enjoy!**
 
 ## Change log
-- 25.07.2025: fixed typos and added image of data visualization
-- 13.06.2025: design and testing
+- 07.11.2025: containerized the API and added configuration for storing the data to an SQL database.
+- 25.07.2025: fixed typos and added image of data visualization.
 - 14.06.2025: initial commit.
+- 13.06.2025: design, development and testing.

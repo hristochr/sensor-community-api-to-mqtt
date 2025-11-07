@@ -14,9 +14,15 @@ API_PASSWORD = os.getenv("API_PASSWORD", '')
 
 
 def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
-    """Verify the HTTP Basic Authentication credentials"""
-    is_username_correct = secrets.compare_digest(credentials.username, API_USERNAME)
-    is_password_correct = secrets.compare_digest(credentials.password, API_PASSWORD)
+    """Verify HTTP Basic Authentication credentials"""
+    # Ensure variables are str
+    username = str(credentials.username)
+    password = str(credentials.password)
+    api_user = str(API_USERNAME)
+    api_pass = str(API_PASSWORD)
+
+    is_username_correct = secrets.compare_digest(username, api_user)
+    is_password_correct = secrets.compare_digest(password, api_pass)
 
     if not (is_username_correct and is_password_correct):
         raise HTTPException(
@@ -25,4 +31,4 @@ def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
             headers={"WWW-Authenticate": "Basic"},
         )
 
-    return credentials.username
+    return username
