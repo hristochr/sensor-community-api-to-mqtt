@@ -3,7 +3,8 @@ from sqlalchemy import (
     Table,
     Column,
     Integer,
-    DateTime
+    DateTime,
+    Index
     )
 from sqlalchemy.dialects.mssql import JSON, DECIMAL
 from sqlalchemy.sql import text
@@ -22,10 +23,15 @@ class WeatherData():
             'WeatherData',
             self.metadata,
             Column('Id', Integer, primary_key=True, autoincrement=True),
-            Column('Timestamp', DateTime, server_default=text('GETDATE()')),
-            Column('Temperature', DECIMAL(5, 2), primary_key=True, nullable=False),
-            Column('Pressure', DECIMAL(10, 2), nullable=False),
+            Column('Timestamp', DateTime, server_default=text('GETDATE()'), nullable=False),
+            Column('Temperature', DECIMAL(5, 2), nullable=False),
+            Column('Pressure', DECIMAL(6, 2), nullable=False),
             Column('Humidity', DECIMAL(5, 2), nullable=False),
             Column('RawData', JSON, nullable=False),
             schema=self.schema_name
         )
+
+        Index('ix_weatherdata_timestamp', self.weather_data.c.Timestamp)
+        Index('ix_weatherdata_timestamp_temp',
+              self.weather_data.c.Timestamp,
+              self.weather_data.c.Temperature)
