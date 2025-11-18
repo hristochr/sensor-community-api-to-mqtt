@@ -55,18 +55,42 @@ Then you can use the Windows task scheduler to run the .bat file every time you 
 - create a storage account `az storage account create -n mystorageaccount1234 -g <RESOURCE_GROUP> -l <LOCATION> --sku Standard_LRS`
 - create a function app `az functionapp create --resource-group <RESOURCE_GROUP> --name <FUNC_NAME> --storage-account <STOR_ACC> --plan <APP_SERVICE_NAME> --image <ACR_NAME>/image_name:latest --assign-identity`
 - set environment variables
-- in case you need to update the existing deployment to use the new image:
-    - run `az functionapp config container set --image <IMAGE_NAME> --registry-password <SECURE_PASSWORD>--registry-username <USER_NAME> --name <APP_NAME> --resource-group <RESOURCE_GROUP>`
+- in case you need to update the existing deployment to use a new image version:
+    - log in to Azure:
+        ```
+        az login
+        az acr login --name <your_acr_name>
+        ```
+    - tag your updated local Docker image:
+        ```
+        docker tag sens-comm-api-mqtt:latest your_acr_name.azurecr.io/sens-comm-api-mqtt:latest
+        ```
+    - push the image to the registry:
+        ```
+        docker push your_acr_name.azurecr.io/sens-comm-api-mqtt:latest
+        ```
+    - update the Function App to use the refreshed image:
+        ```    
+        az functionapp config container set \
+        --name sens-comm-api \
+        --resource-group <rg_name> \
+        --docker-custom-image-name <your_acr_name>.azurecr.io/sens-comm-api-mqtt:latest
+        ```
     - restart the function.
 
 ## Features
-- one endpoint accepting the POST request with the payload from your IoT sensor controller. Once the FastAPI server is running you will be able to access the document at `localhost:8000/docs`:
+- one endpoint accepting the POST request with the payload from your IoT sensor controller. Once the FastAPI server is running you will be able to access the document at `localhost:8000/docs` (or wherever you deployed to):
 
 ![image](images/endpoint.png)
 
 If everything has been configured correctly:
-- the console will show:
+
+- the console will show (*localhost version*):
     ![image](images/result-console.png)
+
+- container logs (*containerized version*):
+    ![image](images/container_logs.png)
+
 - the output will be visible in the HiveMQ cloud console:
     ![image](images/result-mqtt.png)
 
@@ -83,6 +107,7 @@ Using NodeRed "MQTT in"
 **Enjoy!**
 
 ## Change log
+- 18.11.2025: minor fixes to the data model, added data quality checks to the transfomer module and added the node red flow definition.
 - 07.11.2025: containerized the API and added configuration for storing the data to an SQL database.
 - 25.07.2025: fixed typos and added image of data visualization.
 - 14.06.2025: initial commit.
