@@ -56,6 +56,10 @@ Then you can use the Windows task scheduler to run the .bat file every time you 
 - create a function app `az functionapp create --resource-group <RESOURCE_GROUP> --name <FUNC_NAME> --storage-account <STOR_ACC> --plan <APP_SERVICE_NAME> --image <ACR_NAME>/image_name:latest --assign-identity`
 - set environment variables
 - in case you need to update the existing deployment to use a new image version:
+    - rebuild image 
+        ```
+        docker build -t sens-comm-api-mqtt:latest .
+        ```
     - log in to Azure:
         ```
         az login
@@ -74,9 +78,15 @@ Then you can use the Windows task scheduler to run the .bat file every time you 
         az functionapp config container set \
         --name sens-comm-api \
         --resource-group <rg_name> \
-        --docker-custom-image-name <your_acr_name>.azurecr.io/sens-comm-api-mqtt:latest
+        --image <your_acr_name>.azurecr.io/sens-comm-api-mqtt:latest
         ```
-    - restart the function.
+    - restart the function
+        ```
+        az functionapp restart \
+          --name sens-comm-api \
+          --resource-group Sensor.Community
+
+        ```
 
 ## Features
 - one endpoint accepting the POST request with the payload from your IoT sensor controller. Once the FastAPI server is running you will be able to access the document at `localhost:8000/docs` (or wherever you deployed to):
@@ -107,6 +117,7 @@ Using NodeRed "MQTT in"
 **Enjoy!**
 
 ## Change log
+- 02.02.2026: added retain=True to better suit the data for agetn tool calling. 
 - 18.11.2025: minor fixes to the data model, added data quality checks to the transfomer module and added the node red flow definition.
 - 07.11.2025: containerized the API and added configuration for storing the data to an SQL database.
 - 25.07.2025: fixed typos and added image of data visualization.
