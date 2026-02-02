@@ -84,7 +84,10 @@ class MQTTPublisher(DefaultPublisher):
             json_payload = json.dumps(payload_data, default=str)
 
             # Publish with QoS 1 for guaranteed delivery
-            result = self.client.publish(self.topic, json_payload, qos=1)
+            result = self.client.publish(self.topic,
+                                         json_payload,
+                                         qos=1,
+                                         retain=True)
 
             if result.rc == mqtt.MQTT_ERR_SUCCESS:
                 logger.debug(f"Payload published to {self.topic}")
