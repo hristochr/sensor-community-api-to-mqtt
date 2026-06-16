@@ -88,6 +88,17 @@ Then you can use the Windows task scheduler to run the .bat file every time you 
 
         ```
 
+#### Hosting the API with NodeRed (new version)
+
+You can install NodeRed on a machine that is constantly on and available on yout home network. Then import the flow definition from `node_red/node_red_api.json`. This creates a NodeRed hosted API endpoint, with no extra files, containers, or any other configuration needed. 
+The flow will send the data to HiveMQ and AzureSQL. You need to configure your authenticaion settings after importing the flow.
+
+In the sensor configuration menu, you need to configure the custom endpoint like so (replace server IP with yours):
+
+![image](images/node-red-api.png)
+
+
+
 ## Features
 - one endpoint accepting the POST request with the payload from your IoT sensor controller. Once the FastAPI server is running you will be able to access the document at `localhost:8000/docs` (or wherever you deployed to):
 
@@ -123,3 +134,4 @@ Using NodeRed "MQTT in"
 - 25.07.2025: fixed typos and added image of data visualization.
 - 14.06.2025: initial commit.
 - 13.06.2025: design, development and testing.
+- 16.06.2026: added a new NodeRed flow creating a custom API endpoint the sensor can call.

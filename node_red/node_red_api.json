@@ -1,0 +1,245 @@
+[
+    {
+        "id": "b34a2cf3ddab50e7",
+        "type": "tab",
+        "label": "[Air Data] Sens Comm API",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c31a4cdf108f7251",
+        "type": "group",
+        "z": "b34a2cf3ddab50e7",
+        "name": "Success response",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "9a6975b5ccd06799",
+            "071839b1e6b57182",
+            "b188baa66f277be6"
+        ],
+        "x": 834,
+        "y": 199,
+        "w": 252,
+        "h": 202
+    },
+    {
+        "id": "76d3b02057e09e72",
+        "type": "http in",
+        "z": "b34a2cf3ddab50e7",
+        "name": "",
+        "url": "/sens-comm-api",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 300,
+        "wires": [
+            [
+                "787401975423d619",
+                "dc7cd6a7a9b04346"
+            ]
+        ]
+    },
+    {
+        "id": "dc7cd6a7a9b04346",
+        "type": "debug",
+        "z": "b34a2cf3ddab50e7",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "9a6975b5ccd06799",
+        "type": "http response",
+        "z": "b34a2cf3ddab50e7",
+        "g": "c31a4cdf108f7251",
+        "name": "success",
+        "statusCode": "200",
+        "headers": {},
+        "x": 920,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "071839b1e6b57182",
+        "type": "mqtt out",
+        "z": "b34a2cf3ddab50e7",
+        "g": "c31a4cdf108f7251",
+        "name": "",
+        "topic": "uns/weather/balcony1",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "112c8b7005271206",
+        "x": 960,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "b188baa66f277be6",
+        "type": "MSSQL",
+        "z": "b34a2cf3ddab50e7",
+        "g": "c31a4cdf108f7251",
+        "mssqlCN": "12f63729b8277811",
+        "name": "",
+        "outField": "payload",
+        "returnType": 0,
+        "throwErrors": 1,
+        "query": "INSERT INTO [dbo].[WeatherData] (\n    [Temperature],[Pressure],[Humidity],[RawData]\n    )\nVALUES (\n    @Temperature, @Pressure, @Humidity, @RawData\n    )",
+        "modeOpt": "",
+        "modeOptType": "query",
+        "queryOpt": "payload",
+        "queryOptType": "editor",
+        "paramsOpt": "queryParams",
+        "paramsOptType": "msg",
+        "rows": "rows",
+        "rowsType": "msg",
+        "parseMustache": false,
+        "params": [
+            {
+                "output": false,
+                "name": "RawData",
+                "type": "JSON",
+                "valueType": "msg",
+                "value": "payload.RawData",
+                "options": {
+                    "nullable": true,
+                    "primary": false,
+                    "identity": false,
+                    "readOnly": false
+                }
+            }
+        ],
+        "x": 940,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "787401975423d619",
+        "type": "function",
+        "z": "b34a2cf3ddab50e7",
+        "name": "check and transform payload",
+        "func": "const dp = msg.payload;\n\n//build look-up based on json array structure\nconst readings = Object.fromEntries(\n    (dp.sensordatavalues || []).map(s => [s.value_type, s.value])\n);\n\n// dynamic value extraction without positional index \nconst temperature = parseFloat(readings.BME280_temperature);\nconst pressure    = parseFloat(readings.BME280_pressure) / 100.0;\nconst humidity    = parseFloat(readings.BME280_humidity);\n\nfunction reject(reason) {\n    node.error(reason, msg);\n    msg.statusCode = 400;\n    msg.payload = { error: reason };\n    return [null, msg];\n}\n\n// data quality checks\nif (!Number.isFinite(temperature) || temperature < -50 || temperature > 85) {\n    return reject(`Temperature out of range: ${temperature} (expected -50..85 \\u00b0C)`);\n}\nif (!Number.isFinite(humidity) || humidity > 100) {\n    return reject(`Humidity out of range: ${humidity} (expected <= 100 %)`);\n}\nif (!Number.isFinite(pressure) || pressure < 0 || pressure > 1100) {\n    return reject(`Pressure out of range: ${pressure} (expected 0..1100 hPa)`);\n}\n\n// parse timestamp: strip DT# prefix, fix separator, add Z\nconst now = new Date()\nconst ts = now.toISOString()\n\n// modify payload\nmsg.payload = {\n    Temperature: temperature,\n    Pressure: pressure,\n    Humidity: humidity,\n    RawData: dp,\n    timestamp_utc: ts\n};\n\n// define query params \nmsg.queryParams = [\n    { name: \"Temperature\", type: \"FLOAT\", value: msg.payload.Temperature },\n    { name: \"Pressure\", type: \"FLOAT\", value: msg.payload.Pressure },\n    { name: \"Humidity\", type: \"FLOAT\", value: msg.payload.Humidity },\n    { name: \"RawData\", type: \"NVARCHAR\", value: JSON.stringify(dp) }\n];\n\n\nreturn [msg, null];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 300,
+        "wires": [
+            [
+                "071839b1e6b57182",
+                "b188baa66f277be6",
+                "9a6975b5ccd06799"
+            ],
+            [
+                "89cf8939b8752237"
+            ]
+        ]
+    },
+    {
+        "id": "89cf8939b8752237",
+        "type": "http response",
+        "z": "b34a2cf3ddab50e7",
+        "name": "bad request",
+        "statusCode": "400",
+        "headers": {},
+        "x": 910,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "112c8b7005271206",
+        "type": "mqtt-broker",
+        "name": "HiveMQ",
+        "broker": "6165d941bce6438a898bdb68b9ba995b.s1.eu.hivemq.cloud",
+        "port": "8883",
+        "tls": "a6d768000b7c87dd",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "12f63729b8277811",
+        "type": "MSSQL-CN",
+        "tdsVersion": "7_4",
+        "name": "NodeRedAzSQL",
+        "server": "azserver2025.database.windows.net",
+        "port": "1433",
+        "encyption": true,
+        "trustServerCertificate": true,
+        "database": "MSSQLTips2025",
+        "useUTC": true,
+        "connectTimeout": "15000",
+        "requestTimeout": "15000",
+        "cancelTimeout": "5000",
+        "pool": "5",
+        "parseJSON": true,
+        "enableArithAbort": true,
+        "readOnlyIntent": false
+    },
+    {
+        "id": "a6d768000b7c87dd",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": false,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "a890184b81ad66f9",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-mssql-plus": "0.13.1"
+        }
+    }
+]
